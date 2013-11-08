@@ -5,11 +5,14 @@ class window.WebAudioPlayer
 	loadingAudio: {}
 	playingAudio: {}
 
+	usabilityElm: null
 	unlockedIOS: false
 
-	constructor: -> @audioContext = @getAudioContext()
+	constructor: ->
+		@usabilityElm = document.createElement('audio')
+		@audioContext = @getAudioContext()
 
-	isUsable: (cb = ->) -> cb @audioContext? and (document.createElement('audio')).canPlayType?('audio/mpeg')
+	isUsable: (cb = ->) -> cb @audioContext? and @usabilityElm.canPlayType?('audio/mpeg')
 
 	isPlaying: (url) -> Object::hasOwnProperty.call(@playingAudio, url)
 
