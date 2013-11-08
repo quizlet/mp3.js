@@ -3396,9 +3396,10 @@ sinon.xhr = { XMLHttpRequest: this.XMLHttpRequest };
             this.status = typeof status == "number" ? status : 200;
             this.statusText = FakeXMLHttpRequest.statusCodes[this.status];
             this.setResponseBody(body || "");
-            if (typeof this.onload === "function"){
-                this.onload();
-            }
+            // temp fix...
+            // if (typeof this.onload === "function"){
+            //     this.onload();
+            // }
 
         }
     });

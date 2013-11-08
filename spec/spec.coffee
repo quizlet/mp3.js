@@ -49,7 +49,7 @@ describe 'AudioPlayer', ->
 
 		it "should preload audio via xhr when the request completes successfully", ->
 			options = {onLoad: sinon.spy(), onError: sinon.spy()}
-			decodeAudioExpectation = mockAudioContext.expects('decodeAudioData').atLeast(1)
+			decodeAudioExpectation = mockAudioContext.expects('decodeAudioData').once()
 			webAudioPlayer = new WebAudioPlayer
 			webAudioPlayer.preload '/hammertime.mp3', options
 
