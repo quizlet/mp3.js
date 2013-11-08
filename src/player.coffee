@@ -1,7 +1,7 @@
 class window.AudioPlayer
 	constructor: (settings = {}) ->
 		@settings =
-			plugins: settings.plugins || [WebAudioPlayer, FlashAudioPlayer]
+			plugins: settings.plugins || [WebAudioPlayer, HtmlAudioPlayer, FlashAudioPlayer]
 			onUsable: settings.onUsable || ->
 			onNotUsable: settings.onNotUsable || -> window.console?.error? 'Cannot play audio'
 
