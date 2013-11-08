@@ -8,7 +8,7 @@ class window.FlashAudioPlayer
 	durations: {}
 	playingAudio: {}
 
-	SWF_PATH: '<?= imgPath('FlashAudioPlayer.swf', RELATIVE_ASSETS_HOME) ?>'
+	SWF_PATH: ''
 	CONTAINER_ID: 'flashAudioContainer'
 	FLASH_ID: 'flashAudioObject'
 	FLASH_VERSION: '9.0.0'

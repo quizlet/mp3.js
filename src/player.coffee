@@ -1,8 +1,3 @@
-<?= mergeInCoffee(
-	'audio/web_audio_player.coffee',
-	'audio/flash_audio_player.coffee'
-) ?>
-
 class window.AudioPlayer
 	constructor: (settings = {}) ->
 		@settings =

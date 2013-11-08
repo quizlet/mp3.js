@@ -1,6 +1,3 @@
-chai = require('chai')
-chai.should()
-
 describe 'stuff', ->
 	it "should return true if its true", ->
 		x = true

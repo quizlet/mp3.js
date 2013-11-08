@@ -1,0 +1,22 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+  </head>
+  <body>
+    <div id="mocha"></div>
+    <script src="../vendor/mocha/mocha.js"></script>
+    <script src="../vendor/chai/chai.js"></script>
+    <script>
+      mocha.ui('bdd');
+      chai.should();
+    </script>
+    <script src="flash_audio_player.js"></script>
+    <script src="web_audio_player.js"></script>
+    <script src="player.js"></script>
+    <script src="spec.js"></script>
+    <script>
+      if (window.mochaPhantomJS) { mochaPhantomJS.run(); }
+      else { mocha.run(); }
+    </script>
+  </body>
+</html>

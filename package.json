@@ -6,10 +6,8 @@
   , "keywords": ["audio", "mp3", "webaudio"]
   , "repository": "git://github.com/quizlet/mp3.js"
   , "devDependencies": {
-      "chai": "*"
-    , "mocha": "*"
-    , "sinon": "*"
-    , "sinon-chai": "*"
+      "phantomjs": "*"
+    , "mocha-phantomjs": "*"
     , "coffee-script": "*"
   }
 }
