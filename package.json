@@ -1,0 +1,13 @@
+{   "name": "mp3.js"
+  , "description": "Dead simple HTML5 audio player with flahs fallback"
+  , "version": "0.1.0"
+  , "author": "Karoun Kasraie <karoun@quizlet.com>"
+  , "contributors": ["Karoun Kasraie <karoun@quizlet.com>", "David Chanin <dchanin@quizlet.com>"]
+  , "keywords": ["audio", "mp3", "webaudio"]
+  , "repository": "git://github.com/quizlet/mp3.js"
+  , "devDependencies": {
+      "should": "*"
+    , "mocha": "*"
+    , "sinon": "*"
+  }
+}
