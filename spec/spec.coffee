@@ -38,6 +38,11 @@ describe 'AudioPlayer', ->
 		mockAudioContext = null
 
 		beforeEach ->
+			WebAudioPlayer::loadedAudio = {}
+			WebAudioPlayer::loadingAudio = {}
+			WebAudioPlayer::playingAudio = {}
+
+		beforeEach ->
 			fakeBufferSource = 
 				connect: ->
 				start: ->
@@ -47,19 +52,35 @@ describe 'AudioPlayer', ->
 				createBufferSource: -> fakeBufferSource
 			mockAudioContext = sinon.mock(WebAudioPlayer.audioContext)
 
-		it "should preload audio via xhr when the request completes successfully", ->
-			options = {onLoad: sinon.spy(), onError: sinon.spy()}
-			decodeAudioExpectation = mockAudioContext.expects('decodeAudioData').once()
-			webAudioPlayer = new WebAudioPlayer
-			webAudioPlayer.preload '/hammertime.mp3', options
+		describe "preload", ->
 
-			requests.length.should.equal(1)
-			options.onLoad.called.should.be.false
+			it "should preload audio via xhr when the request completes successfully", ->
+				options = {onLoad: sinon.spy(), onError: sinon.spy()}
+				decodeAudioExpectation = mockAudioContext.expects('decodeAudioData').once()
+				webAudioPlayer = new WebAudioPlayer
+				webAudioPlayer.preload '/hammertime.mp3', options
 
-			requests[0].respond(200, { "Content-Type": "audio/mpeg" }, 'mp3contents')
-			decodeAudioExpectation.called.should.be.true
-			decodeAudioExpectation.getCall(0).args[1]('buffer!')
-			options.onLoad.called.should.be.true
-			options.onLoad.getCall(0).args[0].should.equal('/hammertime.mp3')
-			options.onError.called.should.be.false
+				requests.length.should.equal(1, '1 request should get sent')
+				options.onLoad.called.should.be.false
+
+				requests[0].respond(200, { "Content-Type": "audio/mpeg" }, 'mp3contents')
+				decodeAudioExpectation.called.should.be.true
+				decodeAudioExpectation.getCall(0).args[1]('buffer!')
+				options.onLoad.called.should.be.true
+				options.onLoad.getCall(0).args[0].should.equal('/hammertime.mp3')
+				options.onError.called.should.be.false
+				mockAudioContext.verify()
+
+			it "should cache previous results", ->
+				options = {onLoad: sinon.spy(), onError: sinon.spy()}
+				decodeAudioExpectation = mockAudioContext.expects('decodeAudioData').once()
+				webAudioPlayer = new WebAudioPlayer
+				webAudioPlayer.preload '/hammertime.mp3', options
+				requests[0].respond(200, { "Content-Type": "audio/mpeg" }, 'mp3contents')
+				decodeAudioExpectation.getCall(0).args[1]('buffer!')
+				webAudioPlayer.preload '/hammertime.mp3', options
+
+				requests.length.should.equal(1, 'only 1 request should be sent')
+				options.onLoad.callCount.should.equal(2, 'onLoad should get called twice')
+				mockAudioContext.verify()
 
