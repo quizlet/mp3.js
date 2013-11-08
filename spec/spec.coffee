@@ -1,5 +1,16 @@
 describe 'AudioPlayer', ->
 
+	xhr = null
+	requests = null
+
+	beforeEach ->
+		xhr = sinon.useFakeXMLHttpRequest()
+		requests = []
+		xhr.onCreate = (request) -> requests.push request
+
+	afterEach -> 
+		xhr.restore()
+
 	it "should call its onNotUsable callback if no plugins are usable", ->
 		onNotUsableCallback = sinon.spy()
 		player = new AudioPlayer(plugins: [], onNotUsable: onNotUsableCallback)
@@ -17,7 +28,38 @@ describe 'AudioPlayer', ->
 			player = new AudioPlayer(plugins: [pluginClass])
 			player[method]()
 
-			methodExpectation.called.should.equal(false)
+			methodExpectation.called.should.be.false
 			isUsableExpectation.getCall(0).args[0](true) # report the plugin as available
 
 			mockPlugin.verify()
+
+	describe 'WebAudioPlayer', ->
+
+		mockAudioContext = null
+
+		beforeEach ->
+			fakeBufferSource = 
+				connect: ->
+				start: ->
+				noteOn: ->
+			WebAudioPlayer.audioContext = 
+				decodeAudioData: ->
+				createBufferSource: -> fakeBufferSource
+			mockAudioContext = sinon.mock(WebAudioPlayer.audioContext)
+
+		it "should preload audio via xhr when the request completes successfully", ->
+			options = {onLoad: sinon.spy(), onError: sinon.spy()}
+			decodeAudioExpectation = mockAudioContext.expects('decodeAudioData').atLeast(1)
+			webAudioPlayer = new WebAudioPlayer
+			webAudioPlayer.preload '/hammertime.mp3', options
+
+			requests.length.should.equal(1)
+			options.onLoad.called.should.be.false
+
+			requests[0].respond(200, { "Content-Type": "audio/mpeg" }, 'mp3contents')
+			decodeAudioExpectation.called.should.be.true
+			decodeAudioExpectation.getCall(0).args[1]('buffer!')
+			options.onLoad.called.should.be.true
+			options.onLoad.getCall(0).args[0].should.equal('/hammertime.mp3')
+			options.onError.called.should.be.false
+
