@@ -23,5 +23,23 @@ Download mp3.js [here](#download-url)
 
 {% highlight javascript %}
 var player = new AudioPlayer();
+
+// easy playing
 player.play('/hammertime.mp3');
+
+// supports preloading
+player.preload('/what-the-fox-say.mp3');
+
+// Hook into events in the audio lifecycle
+player.play('/all-along-the-watchtower.mp3', {
+  onLoad: function() { alert('Audio Loaded!'); }
+  onError: function() { alert('Error Loading Audio!'); }
+  onStop: function() { alert('Audio Stopped Playing!'); }
+});
+
+// stop everything at any time
+player.stopAll();
+
+// or just stop playing a single file
+player.stop('/hammertime.mp3');
 {% endhighlight %}
