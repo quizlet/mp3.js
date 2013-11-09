@@ -43,3 +43,7 @@ player.stopAll();
 // or just stop playing a single file
 player.stop('/hammertime.mp3');
 {% endhighlight %}
+
+<a href="https://github.com/quizlet/mp3.js">
+  <img style="position: absolute; top: 0; right: 0; border: 0; padding: 0; margin: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub" />
+</a>
