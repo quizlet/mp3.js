@@ -313,6 +313,18 @@ section {
   padding-bottom:50px;
 }
 
+.button {
+  background: #DD0000;
+  border-radius: 3px;
+  color: white;
+  font-size:16px;
+  padding: 5px 10px;
+}
+
+.button:hover {
+  background: #FF0000;
+  text-decoration: none;
+}
 
 /* Footer */
 

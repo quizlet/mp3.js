@@ -6,7 +6,7 @@ tagline: Supporting tagline
 
 ## 1. Get It!
 
-Download mp3.js [here](#download-url)
+<a href="#download-url" class="button">Download mp3.js</a>
 
 ## 2. Include mp3.js on your page
 
