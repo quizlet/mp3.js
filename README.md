@@ -1,5 +1,7 @@
 mp3.js
 ======
+Dead Simple Audio for the Web  
+[http://quizlet.github.io/mp3.js](quizlet.github.io/mp3.js)
 
 ## 1. Get It!
 
