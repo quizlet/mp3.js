@@ -12,6 +12,7 @@
     , "grunt-contrib-coffee": "*"
     , "grunt-contrib-concat": "*"
     , "grunt-contrib-copy": "*"
+    , "grunt-mocha-phantomjs": "*"
     , "grunt": "*"
   }
 }

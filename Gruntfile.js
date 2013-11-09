@@ -25,11 +25,17 @@ module.exports = function(grunt) {
         src: 'dist/<%= pkg.name %>',
         dest: '<%= pkg.name %>'
       }
-    }
+    },
+    mocha_phantomjs: {
+        all: ['build®/**/*.html']
+      }
   });
 
   grunt.loadNpmTasks('grunt-contrib-coffee');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-mocha-phantomjs');
+
+  grunt.registerTask('test', ['mocha_phantomjs']);
   grunt.registerTask('default', ['coffee', 'concat', 'copy']);
 };
