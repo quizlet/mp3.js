@@ -9,5 +9,8 @@
       "phantomjs": "*"
     , "mocha-phantomjs": "*"
     , "coffee-script": "*"
+    , "grunt-contrib-coffee": "*"
+    , "grunt-contrib-concat": "*"
+    , "grunt": "*"
   }
 }
