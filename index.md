@@ -6,7 +6,7 @@ tagline: Supporting tagline
 
 ## 1. Get It!
 
-<a href="#download-url" class="button">Download mp3.js</a>
+<a href="https://raw.github.com/quizlet/mp3.js/master/mp3.js" class="button">Download mp3.js</a>
 
 ## 2. Include mp3.js on your page
 
