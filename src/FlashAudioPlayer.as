@@ -2,16 +2,12 @@ package {
 
 import flash.display.Sprite;
 import flash.external.ExternalInterface;
-import flash.system.Security;
-import flash.utils.setTimeout;
 
 public class FlashAudioPlayer extends Sprite {
 
 	private var instances:Object;
 
 	public function FlashAudioPlayer():void {
-		Security.allowDomain('quizlet.com');
-
 		this.instances = new Object();
 
 		ExternalInterface.addCallback('_preload', preload);
