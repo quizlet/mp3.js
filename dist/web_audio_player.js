@@ -83,10 +83,10 @@
             onStop: options.onStop,
             source: bufferSource,
             gainNode: gainNode,
-            onFinishTimer: timeoutSet(buffer.duration * 1000, function() {
+            onFinishTimer: setTimeout(function() {
               delete _this.playingAudio[url];
               return typeof options.onFinish === "function" ? options.onFinish(url) : void 0;
-            })
+            }, buffer.duration * 1000)
           };
         },
         onError: function() {
@@ -151,9 +151,9 @@
         this.loadingAudio[url].xhr = xhr;
       }
       if (options.timeout) {
-        return timeoutSet(Number(options.timeout), function() {
+        return setTimeout((function() {
           return _this.handleLoadingError(url);
-        });
+        }), Number(options.timeout));
       }
     };
 

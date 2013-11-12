@@ -60,7 +60,7 @@
         if (volume > 0) {
           volume -= 0.03;
           elm.volume = Math.max(volume, 0);
-          return timeoutSet(10, lowerVol);
+          return setTimeout(lowerVol, 10);
         } else {
           elm.pause();
           elm.currentTime = 0;
@@ -89,10 +89,10 @@
           return _this.playingAudio[url] = {
             elm: elm,
             onStop: options.onStop,
-            onFinishTimer: timeoutSet(elm.duration * 1000, function() {
+            onFinishTimer: setTimeout(function() {
               delete _this.playingAudio[url];
               return typeof options.onFinish === "function" ? options.onFinish(url) : void 0;
-            })
+            }, elm.duration * 1000)
           };
         },
         onError: function() {
@@ -135,7 +135,7 @@
         };
         elm = document.createElement('audio');
         elm.setAttribute('preload', 'auto');
-        elm.addEventListener('loadeddata', function() {
+        elm.addEventListener('canplaythrough', function() {
           var cb, _j, _len1, _ref1;
           if (!(url in _this.loadingAudio)) {
             return;
@@ -158,9 +158,9 @@
         this.loadingAudio[url].elm = elm;
       }
       if (options.timeout) {
-        return timeoutSet(Number(options.timeout), function() {
+        return setTimeout((function() {
           return _this.handleLoadingError(url);
-        });
+        }), Number(options.timeout));
       }
     };
 

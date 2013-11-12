@@ -72,7 +72,7 @@
       lowerVol = function() {
         if (volume > 0) {
           _this.flashPlugin._setVolume(url, volume -= 0.03);
-          return timeoutSet(10, lowerVol);
+          return setTimeout(lowerVol, 10);
         } else {
           _this.flashPlugin._stop(url);
           return _this.flashPlugin._setVolume(url, _this.MAX_VOLUME);
@@ -97,10 +97,10 @@
           _this.flashPlugin._play(url);
           return _this.playingAudio[url] = {
             onStop: options.onStop,
-            onFinishTimer: timeoutSet(_this.loadedAudio[url], function() {
+            onFinishTimer: setTimeout(function() {
               delete _this.playingAudio[url];
               return typeof options.onFinish === "function" ? options.onFinish(url) : void 0;
-            })
+            }, _this.loadedAudio[url])
           };
         },
         onError: function() {
@@ -145,11 +145,11 @@
         this.flashPlugin._preload(url);
       }
       if (options.timeout) {
-        return timeoutSet(Number(options.timeout), function() {
+        return setTimeout((function() {
           return _this.loadError({
             url: url
           });
-        });
+        }), Number(options.timeout));
       }
     };
 
@@ -178,7 +178,7 @@
           if (!tries) {
             return _this.onIsUsable(false);
           }
-          return timeoutSet(100, function() {
+          return setTimeout(function() {
             var hasFn, pollFlashObject;
             hasFn = Object.prototype.hasOwnProperty.call(e.ref, 'PercentLoaded') || (e.ref.PercentLoaded != null);
             if (hasFn && e.ref.PercentLoaded()) {
@@ -192,7 +192,7 @@
             } else {
               return waitForFlash(--tries);
             }
-          });
+          }, 100);
         };
         return waitForFlash();
       });

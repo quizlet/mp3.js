@@ -57,9 +57,10 @@ class window.WebAudioPlayer
 					onStop: options.onStop
 					source: bufferSource
 					gainNode: gainNode
-					onFinishTimer: timeoutSet buffer.duration * 1000, =>
+					onFinishTimer: setTimeout =>
 						delete @playingAudio[url]
 						options.onFinish?(url)
+					, buffer.duration * 1000
 
 			onError: -> options.onError?(url)
 			timeout: options.timeout ? 0
@@ -100,7 +101,7 @@ class window.WebAudioPlayer
 			@loadingAudio[url].xhr = xhr
 
 		if options.timeout
-			timeoutSet Number(options.timeout), => @handleLoadingError(url)
+			setTimeout (=> @handleLoadingError(url)), Number(options.timeout)
 
 	unmuteIOS: ->
 		return if @unlockedIOS

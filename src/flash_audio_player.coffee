@@ -37,7 +37,7 @@ class window.FlashAudioPlayer
 		lowerVol = =>
 			if volume > 0
 				@flashPlugin._setVolume url, volume -= 0.03
-				timeoutSet 10, lowerVol
+				setTimeout lowerVol, 10
 			else
 				@flashPlugin._stop url
 				@flashPlugin._setVolume url, @MAX_VOLUME
@@ -53,9 +53,10 @@ class window.FlashAudioPlayer
 				@flashPlugin._play(url)
 				@playingAudio[url] =
 					onStop: options.onStop
-					onFinishTimer: timeoutSet @loadedAudio[url], =>
+					onFinishTimer: setTimeout =>
 						delete @playingAudio[url]
 						options.onFinish?(url)
+					, @loadedAudio[url]
 			onError: -> options.onError?(url)
 			timeout: options.timeout ? 0
 
@@ -83,7 +84,7 @@ class window.FlashAudioPlayer
 			@flashPlugin._preload url
 
 		if options.timeout
-			timeoutSet Number(options.timeout), => @loadError { url }
+			setTimeout (=> @loadError { url }), Number(options.timeout)
 
 	appendFlashObject: ->
 		# Create wrapper
@@ -108,7 +109,7 @@ class window.FlashAudioPlayer
 				# give Flash some time to init PercentLoaded
 				waitForFlash = (tries = 5) =>
 					return @onIsUsable(false) unless tries
-					timeoutSet 100, =>
+					setTimeout =>
 						# similar checks for IE & Firefox, respectively
 						hasFn = Object::hasOwnProperty.call(e.ref, 'PercentLoaded') or e.ref.PercentLoaded?
 						if hasFn and e.ref.PercentLoaded()
@@ -119,6 +120,7 @@ class window.FlashAudioPlayer
 									intervalClear pollFlashObject
 						else
 							waitForFlash --tries
+					, 100
 
 				waitForFlash()
 		)
