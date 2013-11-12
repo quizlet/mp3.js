@@ -53,7 +53,7 @@
       if (!soundData) {
         return;
       }
-      clearTimeout(soundData.onFinish);
+      clearTimeout(soundData.onFinishTimer);
       elm = soundData.elm;
       volume = this.MAX_VOLUME;
       lowerVol = function() {
@@ -89,7 +89,7 @@
           return _this.playingAudio[url] = {
             elm: elm,
             onStop: options.onStop,
-            onFinish: timeoutSet(elm.duration * 1000, function() {
+            onFinishTimer: timeoutSet(elm.duration * 1000, function() {
               delete _this.playingAudio[url];
               return typeof options.onFinish === "function" ? options.onFinish(url) : void 0;
             })

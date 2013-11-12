@@ -30,7 +30,7 @@ class window.WebAudioPlayer
 		soundData = @playingAudio[url]
 		return unless soundData
 
-		clearTimeout soundData.onFinish
+		clearTimeout soundData.onFinishTimer
 		soundData.gainNode.gain.linearRampToValueAtTime 0, @audioContext.currentTime + 0.3
 		delete @playingAudio[url]
 		soundData.onStop?(url)
@@ -57,7 +57,7 @@ class window.WebAudioPlayer
 					onStop: options.onStop
 					source: bufferSource
 					gainNode: gainNode
-					onFinish: timeoutSet buffer.duration * 1000, =>
+					onFinishTimer: timeoutSet buffer.duration * 1000, =>
 						delete @playingAudio[url]
 						options.onFinish?(url)
 

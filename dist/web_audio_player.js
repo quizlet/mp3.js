@@ -53,7 +53,7 @@
       if (!soundData) {
         return;
       }
-      clearTimeout(soundData.onFinish);
+      clearTimeout(soundData.onFinishTimer);
       soundData.gainNode.gain.linearRampToValueAtTime(0, this.audioContext.currentTime + 0.3);
       delete this.playingAudio[url];
       return typeof soundData.onStop === "function" ? soundData.onStop(url) : void 0;
@@ -83,7 +83,7 @@
             onStop: options.onStop,
             source: bufferSource,
             gainNode: gainNode,
-            onFinish: timeoutSet(buffer.duration * 1000, function() {
+            onFinishTimer: timeoutSet(buffer.duration * 1000, function() {
               delete _this.playingAudio[url];
               return typeof options.onFinish === "function" ? options.onFinish(url) : void 0;
             })

@@ -28,7 +28,7 @@ class window.HtmlAudioPlayer
 			@loadingAudio[url].onError = []
 		soundData = @playingAudio[url]
 		return unless soundData
-		clearTimeout soundData.onFinish
+		clearTimeout soundData.onFinishTimer
 		elm = soundData.elm
 
 		volume = @MAX_VOLUME
@@ -55,7 +55,7 @@ class window.HtmlAudioPlayer
 				@playingAudio[url] =
 					elm: elm
 					onStop: options.onStop
-					onFinish: timeoutSet elm.duration * 1000, =>
+					onFinishTimer: timeoutSet elm.duration * 1000, =>
 						delete @playingAudio[url]
 						options.onFinish?(url)
 

@@ -3,9 +3,8 @@ class window.FlashAudioPlayer
 
 	onIsUsable: ->
 
+	loadedAudio: {}
 	loadingAudio: {}
-
-	durations: {}
 	playingAudio: {}
 
 	SWF_PATH: ''
@@ -32,7 +31,7 @@ class window.FlashAudioPlayer
 		@loadingAudio[url] = onLoad: [], onError: [] if url of @loadingAudio
 		soundData = @playingAudio[url]
 		return unless soundData
-		clearTimeout soundData.onFinish
+		clearTimeout soundData.onFinishTimer
 
 		volume = @MAX_VOLUME
 		lowerVol = =>
@@ -54,15 +53,15 @@ class window.FlashAudioPlayer
 				@flashPlugin._play(url)
 				@playingAudio[url] =
 					onStop: options.onStop
-					onFinish: timeoutSet @durations[url], =>
+					onFinishTimer: timeoutSet @loadedAudio[url], =>
 						delete @playingAudio[url]
 						options.onFinish?(url)
 			onError: -> options.onError?(url)
 			timeout: options.timeout ? 0
 
 	destruct: (url) ->
-		if Object::hasOwnProperty.call(@durations, url)
-			delete @durations[url]
+		if Object::hasOwnProperty.call(@loadedAudio, url)
+			delete @loadedAudio[url]
 			@flashPlugin._destruct url
 			return true
 		false
@@ -71,7 +70,7 @@ class window.FlashAudioPlayer
 		return options.onError?() unless url
 
 		# make sure we didn't already load this file
-		return options.onLoad?(url) if @durations[url]
+		return options.onLoad?(url) if @loadedAudio[url]
 
 		if @loadingAudio[url]
 			for method in ['onLoad', 'onError']
@@ -132,6 +131,6 @@ class window.FlashAudioPlayer
 
 	loadComplete: (e) ->
 		return unless e.url of @loadingAudio
-		@durations[e.url] = e.duration
+		@loadedAudio[e.url] = e.duration
 		cb(e.url) for cb in @loadingAudio[e.url].onLoad when cb?
 		delete @loadingAudio[e.url]

@@ -6,9 +6,9 @@
 
     FlashAudioPlayer.prototype.onIsUsable = function() {};
 
-    FlashAudioPlayer.prototype.loadingAudio = {};
+    FlashAudioPlayer.prototype.loadedAudio = {};
 
-    FlashAudioPlayer.prototype.durations = {};
+    FlashAudioPlayer.prototype.loadingAudio = {};
 
     FlashAudioPlayer.prototype.playingAudio = {};
 
@@ -67,7 +67,7 @@
       if (!soundData) {
         return;
       }
-      clearTimeout(soundData.onFinish);
+      clearTimeout(soundData.onFinishTimer);
       volume = this.MAX_VOLUME;
       lowerVol = function() {
         if (volume > 0) {
@@ -97,7 +97,7 @@
           _this.flashPlugin._play(url);
           return _this.playingAudio[url] = {
             onStop: options.onStop,
-            onFinish: timeoutSet(_this.durations[url], function() {
+            onFinishTimer: timeoutSet(_this.loadedAudio[url], function() {
               delete _this.playingAudio[url];
               return typeof options.onFinish === "function" ? options.onFinish(url) : void 0;
             })
@@ -111,8 +111,8 @@
     };
 
     FlashAudioPlayer.prototype.destruct = function(url) {
-      if (Object.prototype.hasOwnProperty.call(this.durations, url)) {
-        delete this.durations[url];
+      if (Object.prototype.hasOwnProperty.call(this.loadedAudio, url)) {
+        delete this.loadedAudio[url];
         this.flashPlugin._destruct(url);
         return true;
       }
@@ -128,7 +128,7 @@
       if (!url) {
         return typeof options.onError === "function" ? options.onError() : void 0;
       }
-      if (this.durations[url]) {
+      if (this.loadedAudio[url]) {
         return typeof options.onLoad === "function" ? options.onLoad(url) : void 0;
       }
       if (this.loadingAudio[url]) {
@@ -219,7 +219,7 @@
       if (!(e.url in this.loadingAudio)) {
         return;
       }
-      this.durations[e.url] = e.duration;
+      this.loadedAudio[e.url] = e.duration;
       _ref = this.loadingAudio[e.url].onLoad;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         cb = _ref[_i];
