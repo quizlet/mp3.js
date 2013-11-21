@@ -32,10 +32,10 @@ player.preload('/what-the-fox-say.mp3');
 // plays audio with custom callback events
 // waits 5 seconds for the file to load before triggering onError
 player.play('/all-along-the-watchtower.mp3', {
-  onLoad: function() { console.log('Audio Loaded!'); }
-  onError: function() { console.log('Error Loading Audio!'); }
-  onStop: function() { console.log('Audio Stopped Playing!'); }
-  timeout: 5000, 
+  onLoad: function() { console.log('Audio Loaded!'); },
+  onError: function() { console.log('Error Loading Audio!'); },
+  onStop: function() { console.log('Audio Stopped Playing!'); },
+  timeout: 5000
 });
 
 // stop everything at any time
