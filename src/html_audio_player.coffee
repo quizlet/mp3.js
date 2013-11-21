@@ -11,7 +11,7 @@ class window.HtmlAudioPlayer
 
 	constructor: -> @usabilityElm = document.createElement('audio')
 
-	isUsable: (cb = ->) -> cb @usabilityElm?.canPlayType?('audio/mpeg')
+	isUsable: (cb = ->) -> cb @usabilityElm?.canPlayType?('audio/mpeg') and navigator?.appVersion?.indexOf('MSIE') is -1
 
 	isPlaying: (url) -> Object::hasOwnProperty.call(@playingAudio, url)
 
@@ -86,7 +86,7 @@ class window.HtmlAudioPlayer
 			elm = document.createElement 'audio'
 			elm.setAttribute 'preload', 'auto'
 
-			elm.addEventListener 'canplaythrough', =>
+			elm.addEventListener 'loadeddata', =>
 				return unless url of @loadingAudio
 				@loadedAudio[url] = @loadingAudio[url].elm
 				cb(url) for cb in @loadingAudio[url].onLoad when cb?
