@@ -11,7 +11,7 @@ class window.HtmlAudioPlayer
 
 	constructor: -> @usabilityElm = document.createElement('audio')
 
-	isUsable: (cb = ->) -> cb @usabilityElm?.canPlayType?('audio/mpeg') and navigator?.appVersion?.indexOf('MSIE') is -1
+	isUsable: (cb = ->) -> cb @usabilityElm?.canPlayType?('audio/mpeg') and navigator.appVersion.indexOf('MSIE') is -1
 
 	isPlaying: (url) -> Object::hasOwnProperty.call(@playingAudio, url)
 

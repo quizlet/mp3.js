@@ -23,7 +23,7 @@
       if (cb == null) {
         cb = function() {};
       }
-      return cb((_ref = this.usabilityElm) != null ? typeof _ref.canPlayType === "function" ? _ref.canPlayType('audio/mpeg') : void 0 : void 0);
+      return cb(((_ref = this.usabilityElm) != null ? typeof _ref.canPlayType === "function" ? _ref.canPlayType('audio/mpeg') : void 0 : void 0) && navigator.appVersion.indexOf('MSIE') === -1);
     };
 
     HtmlAudioPlayer.prototype.isPlaying = function(url) {
@@ -135,7 +135,7 @@
         };
         elm = document.createElement('audio');
         elm.setAttribute('preload', 'auto');
-        elm.addEventListener('canplaythrough', function() {
+        elm.addEventListener('loadeddata', function() {
           var cb, _j, _len1, _ref1;
           if (!(url in _this.loadingAudio)) {
             return;
