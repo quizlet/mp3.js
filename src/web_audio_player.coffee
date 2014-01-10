@@ -111,13 +111,18 @@ class window.WebAudioPlayer
 		(bufferSource.start or bufferSource.noteOn).call(bufferSource, 0)
 		@unlockedIOS = true
 
+	## audioContexts will throw syntax errors
+	## if too many are created on one page.
+	## Catching the error will allow the
+	## plugin to fallthrough gracefully.
 	getAudioContext: ->
-		unless WebAudioPlayer.audioContext
-			if AudioContext?
-				WebAudioPlayer.audioContext = new AudioContext()
-			else if webkitAudioContext?
-				WebAudioPlayer.audioContext = new webkitAudioContext()
-		WebAudioPlayer.audioContext
+		try
+			unless WebAudioPlayer.audioContext
+				if AudioContext?
+					WebAudioPlayer.audioContext = new AudioContext()
+				else if webkitAudioContext?
+					WebAudioPlayer.audioContext = new webkitAudioContext()
+			WebAudioPlayer.audioContext
 
 	handleLoadingError: (url) ->
 		return unless url of @loadingAudio

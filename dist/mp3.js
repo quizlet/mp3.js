@@ -682,14 +682,16 @@
     };
 
     WebAudioPlayer.prototype.getAudioContext = function() {
-      if (!WebAudioPlayer.audioContext) {
-        if (typeof AudioContext !== "undefined" && AudioContext !== null) {
-          WebAudioPlayer.audioContext = new AudioContext();
-        } else if (typeof webkitAudioContext !== "undefined" && webkitAudioContext !== null) {
-          WebAudioPlayer.audioContext = new webkitAudioContext();
+      try {
+        if (!WebAudioPlayer.audioContext) {
+          if (typeof AudioContext !== "undefined" && AudioContext !== null) {
+            WebAudioPlayer.audioContext = new AudioContext();
+          } else if (typeof webkitAudioContext !== "undefined" && webkitAudioContext !== null) {
+            WebAudioPlayer.audioContext = new webkitAudioContext();
+          }
         }
-      }
-      return WebAudioPlayer.audioContext;
+        return WebAudioPlayer.audioContext;
+      } catch (_error) {}
     };
 
     WebAudioPlayer.prototype.handleLoadingError = function(url) {
