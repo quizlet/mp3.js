@@ -113,11 +113,12 @@ class window.FlashAudioPlayer
 						# similar checks for IE & Firefox, respectively
 						hasFn = Object::hasOwnProperty.call(e.ref, 'PercentLoaded') or e.ref.PercentLoaded?
 						if hasFn and e.ref.PercentLoaded()
-							pollFlashObject = intervalSet 250, =>
+							pollFlashObject = setInterval =>
 								if e.ref.PercentLoaded() is 100
 									@flashPlugin = e.ref
 									@onIsUsable true
 									intervalClear pollFlashObject
+							, 250
 						else
 							waitForFlash --tries
 					, 100

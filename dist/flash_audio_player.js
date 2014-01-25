@@ -182,13 +182,13 @@
             var hasFn, pollFlashObject;
             hasFn = Object.prototype.hasOwnProperty.call(e.ref, 'PercentLoaded') || (e.ref.PercentLoaded != null);
             if (hasFn && e.ref.PercentLoaded()) {
-              return pollFlashObject = intervalSet(250, function() {
+              return pollFlashObject = setInterval(function() {
                 if (e.ref.PercentLoaded() === 100) {
                   _this.flashPlugin = e.ref;
                   _this.onIsUsable(true);
                   return intervalClear(pollFlashObject);
                 }
-              });
+              }, 250);
             } else {
               return waitForFlash(--tries);
             }
