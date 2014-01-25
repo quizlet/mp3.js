@@ -96,7 +96,7 @@ class window.WebAudioPlayer
 					cb(url) for cb in @loadingAudio[url].onLoad when cb?
 					delete @loadingAudio[url]
 				, => @handleLoadingError(url)
-			xhr.onerror => @handleLoadingError(url)
+			xhr.onerror = => @handleLoadingError(url)
 			xhr.send()
 			@loadingAudio[url].xhr = xhr
 

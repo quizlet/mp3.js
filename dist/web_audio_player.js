@@ -147,9 +147,9 @@
             return _this.handleLoadingError(url);
           });
         };
-        xhr.onerror(function() {
+        xhr.onerror = function() {
           return _this.handleLoadingError(url);
-        });
+        };
         xhr.send();
         this.loadingAudio[url].xhr = xhr;
       }
