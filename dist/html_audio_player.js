@@ -43,8 +43,7 @@
     };
 
     HtmlAudioPlayer.prototype.stop = function(url) {
-      var elm, lowerVol, soundData, volume,
-        _this = this;
+      var elm, lowerVol, soundData, volume;
       if (url in this.loadingAudio) {
         this.loadingAudio[url].onLoad = [];
         this.loadingAudio[url].onError = [];
@@ -56,45 +55,48 @@
       clearTimeout(soundData.onFinishTimer);
       elm = soundData.elm;
       volume = this.MAX_VOLUME;
-      lowerVol = function() {
-        if (volume > 0) {
-          volume -= 0.03;
-          elm.volume = Math.max(volume, 0);
-          return setTimeout(lowerVol, 10);
-        } else {
-          elm.pause();
-          elm.currentTime = 0;
-          return elm.volume = _this.MAX_VOLUME;
-        }
-      };
+      lowerVol = (function(_this) {
+        return function() {
+          if (volume > 0) {
+            volume -= 0.03;
+            elm.volume = Math.max(volume, 0);
+            return setTimeout(lowerVol, 10);
+          } else {
+            elm.pause();
+            elm.currentTime = 0;
+            return elm.volume = _this.MAX_VOLUME;
+          }
+        };
+      })(this);
       lowerVol();
       delete this.playingAudio[url];
       return typeof soundData.onStop === "function" ? soundData.onStop(url) : void 0;
     };
 
     HtmlAudioPlayer.prototype.play = function(url, options) {
-      var _ref,
-        _this = this;
+      var _ref;
       if (options == null) {
         options = {};
       }
       return this.preload(url, {
-        onLoad: function() {
-          var elm;
-          if (_this.playingAudio[url]) {
-            _this.stop(url);
-          }
-          elm = _this.loadedAudio[url];
-          elm.play();
-          return _this.playingAudio[url] = {
-            elm: elm,
-            onStop: options.onStop,
-            onFinishTimer: setTimeout(function() {
-              delete _this.playingAudio[url];
-              return typeof options.onFinish === "function" ? options.onFinish(url) : void 0;
-            }, elm.duration * 1000)
+        onLoad: (function(_this) {
+          return function(duration) {
+            var elm;
+            if (_this.playingAudio[url]) {
+              _this.stop(url);
+            }
+            elm = _this.loadedAudio[url];
+            elm.play();
+            return _this.playingAudio[url] = {
+              elm: elm,
+              onStop: options.onStop,
+              onFinishTimer: setTimeout(function() {
+                delete _this.playingAudio[url];
+                return typeof options.onFinish === "function" ? options.onFinish(url) : void 0;
+              }, duration)
+            };
           };
-        },
+        })(this),
         onError: function() {
           return typeof options.onError === "function" ? options.onError(url) : void 0;
         },
@@ -111,8 +113,7 @@
     };
 
     HtmlAudioPlayer.prototype.preload = function(url, options) {
-      var elm, method, _i, _len, _ref,
-        _this = this;
+      var elm, method, _i, _len, _ref;
       if (options == null) {
         options = {};
       }
@@ -120,7 +121,7 @@
         return typeof options.onError === "function" ? options.onError() : void 0;
       }
       if (this.loadedAudio[url]) {
-        return typeof options.onLoad === "function" ? options.onLoad(url) : void 0;
+        return typeof options.onLoad === "function" ? options.onLoad(this.loadedAudio[url].duration * 1000) : void 0;
       }
       if (this.loadingAudio[url]) {
         _ref = ['onLoad', 'onError'];
@@ -135,32 +136,38 @@
         };
         elm = document.createElement('audio');
         elm.setAttribute('preload', 'auto');
-        elm.addEventListener('loadeddata', function() {
-          var cb, _j, _len1, _ref1;
-          if (!(url in _this.loadingAudio)) {
-            return;
-          }
-          _this.loadedAudio[url] = _this.loadingAudio[url].elm;
-          _ref1 = _this.loadingAudio[url].onLoad;
-          for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-            cb = _ref1[_j];
-            if (cb != null) {
-              cb(url);
+        elm.addEventListener('loadeddata', (function(_this) {
+          return function() {
+            var cb, _j, _len1, _ref1;
+            if (!(url in _this.loadingAudio)) {
+              return;
             }
-          }
-          return delete _this.loadingAudio[url];
-        }, false);
-        elm.addEventListener('error', function() {
-          return _this.handleLoadingError(url);
-        }, false);
+            _this.loadedAudio[url] = _this.loadingAudio[url].elm;
+            _ref1 = _this.loadingAudio[url].onLoad;
+            for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+              cb = _ref1[_j];
+              if (cb != null) {
+                cb(_this.loadedAudio[url].duration * 1000);
+              }
+            }
+            return delete _this.loadingAudio[url];
+          };
+        })(this), false);
+        elm.addEventListener('error', (function(_this) {
+          return function() {
+            return _this.handleLoadingError(url);
+          };
+        })(this), false);
         elm.src = url;
         elm.load();
         this.loadingAudio[url].elm = elm;
       }
       if (options.timeout) {
-        return setTimeout((function() {
-          return _this.handleLoadingError(url);
-        }), Number(options.timeout));
+        return setTimeout(((function(_this) {
+          return function() {
+            return _this.handleLoadingError(url);
+          };
+        })(this)), Number(options.timeout));
       }
     };
 

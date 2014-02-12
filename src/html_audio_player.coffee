@@ -48,7 +48,7 @@ class window.HtmlAudioPlayer
 
 	play: (url, options = {}) ->
 		@preload url,
-			onLoad: =>
+			onLoad: (duration) =>
 				@stop(url) if @playingAudio[url]
 				elm = @loadedAudio[url]
 				elm.play()
@@ -58,7 +58,7 @@ class window.HtmlAudioPlayer
 					onFinishTimer: setTimeout =>
 						delete @playingAudio[url]
 						options.onFinish?(url)
-					, elm.duration * 1000
+					, duration
 
 			onError: -> options.onError?(url)
 			timeout: options.timeout ? 0
@@ -73,7 +73,7 @@ class window.HtmlAudioPlayer
 		return options.onError?() unless url
 
 		# make sure we didn't already load this file
-		return options.onLoad?(url) if @loadedAudio[url]
+		return options.onLoad?(@loadedAudio[url].duration * 1000) if @loadedAudio[url]
 
 		if @loadingAudio[url]
 			for method in ['onLoad', 'onError']
@@ -89,7 +89,7 @@ class window.HtmlAudioPlayer
 			elm.addEventListener 'loadeddata', =>
 				return unless url of @loadingAudio
 				@loadedAudio[url] = @loadingAudio[url].elm
-				cb(url) for cb in @loadingAudio[url].onLoad when cb?
+				cb(@loadedAudio[url].duration * 1000) for cb in @loadingAudio[url].onLoad when cb?
 				delete @loadingAudio[url]
 			, false
 

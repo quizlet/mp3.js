@@ -48,7 +48,7 @@ class window.FlashAudioPlayer
 
 	play: (url, options = {}) ->
 		@preload url,
-			onLoad: =>
+			onLoad: (duration) =>
 				@stop(url) if @playingAudio[url]
 				@flashPlugin._play(url)
 				@playingAudio[url] =
@@ -56,7 +56,7 @@ class window.FlashAudioPlayer
 					onFinishTimer: setTimeout =>
 						delete @playingAudio[url]
 						options.onFinish?(url)
-					, @loadedAudio[url]
+					, duration
 			onError: -> options.onError?(url)
 			timeout: options.timeout ? 0
 
@@ -71,7 +71,7 @@ class window.FlashAudioPlayer
 		return options.onError?() unless url
 
 		# make sure we didn't already load this file
-		return options.onLoad?(url) if @loadedAudio[url]
+		return options.onLoad?(@loadedAudio[url]) if @loadedAudio[url]
 
 		if @loadingAudio[url]
 			for method in ['onLoad', 'onError']
@@ -135,5 +135,5 @@ class window.FlashAudioPlayer
 	loadComplete: (e) ->
 		return unless e.url of @loadingAudio
 		@loadedAudio[e.url] = e.duration
-		cb(e.url) for cb in @loadingAudio[e.url].onLoad when cb?
+		cb(e.duration) for cb in @loadingAudio[e.url].onLoad when cb?
 		delete @loadingAudio[e.url]

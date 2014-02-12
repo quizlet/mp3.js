@@ -60,35 +60,36 @@
     };
 
     WebAudioPlayer.prototype.play = function(url, options) {
-      var _ref,
-        _this = this;
+      var _ref;
       if (options == null) {
         options = {};
       }
       return this.preload(url, {
-        onLoad: function() {
-          var buffer, bufferSource, gainNode;
-          if (_this.playingAudio[url]) {
-            _this.stop(url);
-          }
-          buffer = _this.loadedAudio[url];
-          bufferSource = _this.audioContext.createBufferSource();
-          bufferSource.buffer = buffer;
-          gainNode = (_this.audioContext.createGainNode || _this.audioContext.createGain).call(_this.audioContext);
-          gainNode.gain.linearRampToValueAtTime(1, _this.audioContext.currentTime);
-          gainNode.connect(_this.audioContext.destination);
-          bufferSource.connect(gainNode);
-          (bufferSource.noteOn || bufferSource.start).call(bufferSource, 0);
-          return _this.playingAudio[url] = {
-            onStop: options.onStop,
-            source: bufferSource,
-            gainNode: gainNode,
-            onFinishTimer: setTimeout(function() {
-              delete _this.playingAudio[url];
-              return typeof options.onFinish === "function" ? options.onFinish(url) : void 0;
-            }, buffer.duration * 1000)
+        onLoad: (function(_this) {
+          return function(duration) {
+            var buffer, bufferSource, gainNode;
+            if (_this.playingAudio[url]) {
+              _this.stop(url);
+            }
+            buffer = _this.loadedAudio[url];
+            bufferSource = _this.audioContext.createBufferSource();
+            bufferSource.buffer = buffer;
+            gainNode = (_this.audioContext.createGainNode || _this.audioContext.createGain).call(_this.audioContext);
+            gainNode.gain.linearRampToValueAtTime(1, _this.audioContext.currentTime);
+            gainNode.connect(_this.audioContext.destination);
+            bufferSource.connect(gainNode);
+            (bufferSource.noteOn || bufferSource.start).call(bufferSource, 0);
+            return _this.playingAudio[url] = {
+              onStop: options.onStop,
+              source: bufferSource,
+              gainNode: gainNode,
+              onFinishTimer: setTimeout(function() {
+                delete _this.playingAudio[url];
+                return typeof options.onFinish === "function" ? options.onFinish(url) : void 0;
+              }, duration)
+            };
           };
-        },
+        })(this),
         onError: function() {
           return typeof options.onError === "function" ? options.onError(url) : void 0;
         },
@@ -105,8 +106,7 @@
     };
 
     WebAudioPlayer.prototype.preload = function(url, options) {
-      var method, xhr, _i, _len, _ref,
-        _this = this;
+      var method, xhr, _i, _len, _ref;
       if (options == null) {
         options = {};
       }
@@ -115,7 +115,7 @@
       }
       this.unmuteIOS();
       if (this.loadedAudio[url]) {
-        return typeof options.onLoad === "function" ? options.onLoad(url) : void 0;
+        return typeof options.onLoad === "function" ? options.onLoad(this.loadedAudio[url].duration * 1000) : void 0;
       }
       if (this.loadingAudio[url]) {
         _ref = ['onLoad', 'onError'];
@@ -131,32 +131,38 @@
         xhr = new XMLHttpRequest();
         xhr.open('GET', url, true);
         xhr.responseType = 'arraybuffer';
-        xhr.onload = function() {
-          return _this.audioContext.decodeAudioData(xhr.response, function(buffer) {
-            var cb, _j, _len1, _ref1;
-            _this.loadedAudio[url] = buffer;
-            _ref1 = _this.loadingAudio[url].onLoad;
-            for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-              cb = _ref1[_j];
-              if (cb != null) {
-                cb(url);
+        xhr.onload = (function(_this) {
+          return function() {
+            return _this.audioContext.decodeAudioData(xhr.response, function(buffer) {
+              var cb, _j, _len1, _ref1;
+              _this.loadedAudio[url] = buffer;
+              _ref1 = _this.loadingAudio[url].onLoad;
+              for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+                cb = _ref1[_j];
+                if (cb != null) {
+                  cb(buffer.duration * 1000);
+                }
               }
-            }
-            return delete _this.loadingAudio[url];
-          }, function() {
+              return delete _this.loadingAudio[url];
+            }, function() {
+              return _this.handleLoadingError(url);
+            });
+          };
+        })(this);
+        xhr.onerror = (function(_this) {
+          return function() {
             return _this.handleLoadingError(url);
-          });
-        };
-        xhr.onerror = function() {
-          return _this.handleLoadingError(url);
-        };
+          };
+        })(this);
         xhr.send();
         this.loadingAudio[url].xhr = xhr;
       }
       if (options.timeout) {
-        return setTimeout((function() {
-          return _this.handleLoadingError(url);
-        }), Number(options.timeout));
+        return setTimeout(((function(_this) {
+          return function() {
+            return _this.handleLoadingError(url);
+          };
+        })(this)), Number(options.timeout));
       }
     };
 

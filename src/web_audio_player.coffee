@@ -37,7 +37,7 @@ class window.WebAudioPlayer
 
 	play: (url, options = {}) ->
 		@preload url,
-			onLoad: =>
+			onLoad: (duration) =>
 				@stop(url) if @playingAudio[url]
 
 				# Create (or replace) buffer source
@@ -60,7 +60,7 @@ class window.WebAudioPlayer
 					onFinishTimer: setTimeout =>
 						delete @playingAudio[url]
 						options.onFinish?(url)
-					, buffer.duration * 1000
+					, duration
 
 			onError: -> options.onError?(url)
 			timeout: options.timeout ? 0
@@ -77,7 +77,7 @@ class window.WebAudioPlayer
 		@unmuteIOS()
 
 		# make sure we didn't already load this file
-		return options.onLoad?(url) if @loadedAudio[url]
+		return options.onLoad?(@loadedAudio[url].duration * 1000) if @loadedAudio[url]
 
 		if @loadingAudio[url]
 			for method in ['onLoad', 'onError']
@@ -93,7 +93,7 @@ class window.WebAudioPlayer
 			xhr.onload = =>
 				@audioContext.decodeAudioData xhr.response, (buffer) =>
 					@loadedAudio[url] = buffer
-					cb(url) for cb in @loadingAudio[url].onLoad when cb?
+					cb(buffer.duration * 1000) for cb in @loadingAudio[url].onLoad when cb?
 					delete @loadingAudio[url]
 				, => @handleLoadingError(url)
 			xhr.onerror = => @handleLoadingError(url)
