@@ -55,7 +55,8 @@
     };
 
     FlashAudioPlayer.prototype.stop = function(url) {
-      var lowerVol, soundData, volume;
+      var lowerVol, soundData, volume,
+        _this = this;
       if (url in this.loadingAudio) {
         this.loadingAudio[url] = {
           onLoad: [],
@@ -68,43 +69,40 @@
       }
       clearTimeout(soundData.onFinishTimer);
       volume = this.MAX_VOLUME;
-      lowerVol = (function(_this) {
-        return function() {
-          if (volume > 0) {
-            _this.flashPlugin._setVolume(url, volume -= 0.03);
-            return setTimeout(lowerVol, 10);
-          } else {
-            _this.flashPlugin._stop(url);
-            return _this.flashPlugin._setVolume(url, _this.MAX_VOLUME);
-          }
-        };
-      })(this);
+      lowerVol = function() {
+        if (volume > 0) {
+          _this.flashPlugin._setVolume(url, volume -= 0.03);
+          return setTimeout(lowerVol, 10);
+        } else {
+          _this.flashPlugin._stop(url);
+          return _this.flashPlugin._setVolume(url, _this.MAX_VOLUME);
+        }
+      };
       lowerVol();
       delete this.playingAudio[url];
       return typeof soundData.onStop === "function" ? soundData.onStop(url) : void 0;
     };
 
     FlashAudioPlayer.prototype.play = function(url, options) {
-      var _ref;
+      var _ref,
+        _this = this;
       if (options == null) {
         options = {};
       }
       return this.preload(url, {
-        onLoad: (function(_this) {
-          return function(duration) {
-            if (_this.playingAudio[url]) {
-              _this.stop(url);
-            }
-            _this.flashPlugin._play(url);
-            return _this.playingAudio[url] = {
-              onStop: options.onStop,
-              onFinishTimer: setTimeout(function() {
-                delete _this.playingAudio[url];
-                return typeof options.onFinish === "function" ? options.onFinish(url) : void 0;
-              }, duration)
-            };
+        onLoad: function(duration) {
+          if (_this.playingAudio[url]) {
+            _this.stop(url);
+          }
+          _this.flashPlugin._play(url);
+          return _this.playingAudio[url] = {
+            onStop: options.onStop,
+            onFinishTimer: setTimeout(function() {
+              delete _this.playingAudio[url];
+              return typeof options.onFinish === "function" ? options.onFinish(url) : void 0;
+            }, duration)
           };
-        })(this),
+        },
         onError: function() {
           return typeof options.onError === "function" ? options.onError(url) : void 0;
         },
@@ -122,7 +120,8 @@
     };
 
     FlashAudioPlayer.prototype.preload = function(url, options) {
-      var method, _i, _len, _ref;
+      var method, _i, _len, _ref,
+        _this = this;
       if (options == null) {
         options = {};
       }
@@ -146,18 +145,17 @@
         this.flashPlugin._preload(url);
       }
       if (options.timeout) {
-        return setTimeout(((function(_this) {
-          return function() {
-            return _this.loadError({
-              url: url
-            });
-          };
-        })(this)), Number(options.timeout));
+        return setTimeout((function() {
+          return _this.loadError({
+            url: url
+          });
+        }), Number(options.timeout));
       }
     };
 
     FlashAudioPlayer.prototype.appendFlashObject = function() {
-      var replacement, wrapper;
+      var replacement, wrapper,
+        _this = this;
       wrapper = document.createElement('div');
       wrapper.id = this.CONTAINER_ID;
       wrapper.style.position = 'absolute';
@@ -168,38 +166,36 @@
       document.body.appendChild(wrapper);
       return swfobject.embedSWF(this.SWF_PATH, this.FLASH_ID, '1', '1', this.FLASH_VERSION, null, null, {
         allowScriptAccess: 'always'
-      }, null, (function(_this) {
-        return function(e) {
-          var waitForFlash;
-          if (!(e.success && e.ref)) {
+      }, null, function(e) {
+        var waitForFlash;
+        if (!(e.success && e.ref)) {
+          return _this.onIsUsable(false);
+        }
+        waitForFlash = function(tries) {
+          if (tries == null) {
+            tries = 5;
+          }
+          if (!tries) {
             return _this.onIsUsable(false);
           }
-          waitForFlash = function(tries) {
-            if (tries == null) {
-              tries = 5;
+          return setTimeout(function() {
+            var hasFn, pollFlashObject;
+            hasFn = Object.prototype.hasOwnProperty.call(e.ref, 'PercentLoaded') || (e.ref.PercentLoaded != null);
+            if (hasFn && e.ref.PercentLoaded()) {
+              return pollFlashObject = setInterval(function() {
+                if (e.ref.PercentLoaded() === 100) {
+                  _this.flashPlugin = e.ref;
+                  _this.onIsUsable(true);
+                  return intervalClear(pollFlashObject);
+                }
+              }, 250);
+            } else {
+              return waitForFlash(--tries);
             }
-            if (!tries) {
-              return _this.onIsUsable(false);
-            }
-            return setTimeout(function() {
-              var hasFn, pollFlashObject;
-              hasFn = Object.prototype.hasOwnProperty.call(e.ref, 'PercentLoaded') || (e.ref.PercentLoaded != null);
-              if (hasFn && e.ref.PercentLoaded()) {
-                return pollFlashObject = setInterval(function() {
-                  if (e.ref.PercentLoaded() === 100) {
-                    _this.flashPlugin = e.ref;
-                    _this.onIsUsable(true);
-                    return intervalClear(pollFlashObject);
-                  }
-                }, 250);
-              } else {
-                return waitForFlash(--tries);
-              }
-            }, 100);
-          };
-          return waitForFlash();
+          }, 100);
         };
-      })(this));
+        return waitForFlash();
+      });
     };
 
     FlashAudioPlayer.prototype.loadError = function(e) {
