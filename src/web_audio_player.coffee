@@ -117,12 +117,12 @@ class window.WebAudioPlayer
 	## plugin to fallthrough gracefully.
 	getAudioContext: ->
 		try
-			unless WebAudioPlayer.audioContext
+			unless @constructor.audioContext
 				if AudioContext?
-					WebAudioPlayer.audioContext = new AudioContext()
+					@constructor.audioContext = new AudioContext()
 				else if webkitAudioContext?
-					WebAudioPlayer.audioContext = new webkitAudioContext()
-			WebAudioPlayer.audioContext
+					@constructor.audioContext = new webkitAudioContext()
+			@constructor.audioContext
 
 	handleLoadingError: (url) ->
 		return unless url of @loadingAudio

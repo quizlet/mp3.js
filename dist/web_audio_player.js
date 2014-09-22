@@ -173,14 +173,14 @@
 
     WebAudioPlayer.prototype.getAudioContext = function() {
       try {
-        if (!WebAudioPlayer.audioContext) {
+        if (!this.constructor.audioContext) {
           if (typeof AudioContext !== "undefined" && AudioContext !== null) {
-            WebAudioPlayer.audioContext = new AudioContext();
+            this.constructor.audioContext = new AudioContext();
           } else if (typeof webkitAudioContext !== "undefined" && webkitAudioContext !== null) {
-            WebAudioPlayer.audioContext = new webkitAudioContext();
+            this.constructor.audioContext = new webkitAudioContext();
           }
         }
-        return WebAudioPlayer.audioContext;
+        return this.constructor.audioContext;
       } catch (_error) {}
     };
 

@@ -5,6 +5,8 @@
   factory = function() {
     var AudioPlayer;
     return AudioPlayer = (function() {
+      AudioPlayer.usablePlugin = null;
+
       function AudioPlayer(settings) {
         var method, _fn, _ref,
           _this = this;
@@ -62,27 +64,36 @@
       AudioPlayer.prototype.initUsablePlugin = function() {
         var plugin, _base,
           _this = this;
+        if (this.constructor.usablePlugin != null) {
+          this._initPlugin(this.constructor.usablePlugin);
+          return;
+        }
         plugin = this.settings.plugins.shift();
         if (!plugin) {
           return typeof (_base = this.settings).onNotUsable === "function" ? _base.onNotUsable() : void 0;
         }
         return plugin.getInstance().isUsable(function(usable) {
-          var args, method, _base1, _ref, _results;
           if (usable) {
-            _this.plugin = plugin.getInstance();
-            if (typeof (_base1 = _this.settings).onUsable === "function") {
-              _base1.onUsable();
-            }
-            _results = [];
-            while (_this.methodBuffer.length) {
-              _ref = _this.methodBuffer.shift(), method = _ref[0], args = _ref[1];
-              _results.push(_this.plugin[method].apply(_this.plugin, args));
-            }
-            return _results;
+            return _this._initPlugin(plugin);
           } else {
             return _this.initUsablePlugin();
           }
         });
+      };
+
+      AudioPlayer.prototype._initPlugin = function(plugin) {
+        var args, method, _base, _ref, _results;
+        this.plugin = plugin.getInstance();
+        this.constructor.usablePlugin = plugin;
+        if (typeof (_base = this.settings).onUsable === "function") {
+          _base.onUsable();
+        }
+        _results = [];
+        while (this.methodBuffer.length) {
+          _ref = this.methodBuffer.shift(), method = _ref[0], args = _ref[1];
+          _results.push(this.plugin[method].apply(this.plugin, args));
+        }
+        return _results;
       };
 
       return AudioPlayer;

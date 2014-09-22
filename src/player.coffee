@@ -1,5 +1,6 @@
 factory = ->
 	class AudioPlayer
+		@usablePlugin: null
 		constructor: (settings = {}) ->
 			@settings =
 				plugins: settings.plugins || [WebAudioPlayer, HtmlAudioPlayer, FlashAudioPlayer]
@@ -23,17 +24,26 @@ factory = ->
 			@initUsablePlugin()
 
 		initUsablePlugin: ->
+			# Already found usable plugin?
+			if @constructor.usablePlugin?
+				@_initPlugin(@constructor.usablePlugin)
+				return
+
 			plugin = @settings.plugins.shift()
 			return @settings.onNotUsable?() unless plugin
 			plugin.getInstance().isUsable (usable) =>
 				if usable
-					@plugin = plugin.getInstance()
-					@settings.onUsable?()
-					while @methodBuffer.length
-						[method, args] = @methodBuffer.shift()
-						@plugin[method].apply @plugin, args
+					@_initPlugin(plugin)
 				else
 					@initUsablePlugin()
+
+		_initPlugin: (plugin) ->
+			@plugin = plugin.getInstance()
+			@constructor.usablePlugin = plugin
+			@settings.onUsable?()
+			while @methodBuffer.length
+				[method, args] = @methodBuffer.shift()
+				@plugin[method].apply @plugin, args
 
 do (root = @, factory) ->
 	if typeof define is 'function' and define.amd
