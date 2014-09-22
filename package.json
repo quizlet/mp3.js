@@ -1,4 +1,5 @@
 {   "name": "mp3.js"
+	, "main": "mp3.js"
   , "description": "Dead simple HTML5 audio player with flash fallback"
   , "version": "0.1.0"
   , "author": "Karoun Kasraie <karoun@quizlet.com>"
