@@ -5,7 +5,7 @@ module.exports = function(grunt) {
       main: {
         options: { join: true },
         files: {
-          'dist/mp3.js': ['src/web_audio_player.coffee', 'src/html_audio_player.coffee', 'src/flash_audio_player.coffee', 'src/player.coffee'],
+          'dist/<%= pkg.name %>': ['src/web_audio_player.coffee', 'src/html_audio_player.coffee', 'src/flash_audio_player.coffee', 'src/player.coffee'],
           'dist/player.js': 'src/player.coffee',
           'dist/flash_audio_player.js': 'src/flash_audio_player.coffee',
           'dist/html_audio_player.js': 'src/html_audio_player.coffee',
