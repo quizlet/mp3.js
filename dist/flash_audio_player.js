@@ -18,7 +18,7 @@
 
     FlashAudioPlayer.prototype.FLASH_ID = 'flashAudioObject';
 
-    FlashAudioPlayer.prototype.FLASH_VERSION = '9.0.0';
+    FlashAudioPlayer.prototype.FLASH_VERSION = [9, 0];
 
     FlashAudioPlayer.prototype.MAX_VOLUME = 1;
 
@@ -164,37 +164,42 @@
       replacement.id = this.FLASH_ID;
       wrapper.appendChild(replacement);
       document.body.appendChild(wrapper);
-      return swfobject.embedSWF(this.SWF_PATH, this.FLASH_ID, '1', '1', this.FLASH_VERSION, null, null, {
-        allowScriptAccess: 'always'
-      }, null, function(e) {
-        var waitForFlash;
-        if (!(e.success && e.ref)) {
-          return _this.onIsUsable(false);
-        }
-        waitForFlash = function(tries) {
-          if (tries == null) {
-            tries = 5;
-          }
-          if (!tries) {
+      return flashembed(this.FLASH_ID, {
+        src: this.SWF_PATH,
+        width: '1',
+        height: '1',
+        version: this.FLASH_VERSION,
+        onEmbed: function(success, ref) {
+          var api, waitForFlash;
+          if (!(success && ref.getApi())) {
             return _this.onIsUsable(false);
           }
-          return setTimeout(function() {
-            var hasFn, pollFlashObject;
-            hasFn = Object.prototype.hasOwnProperty.call(e.ref, 'PercentLoaded') || (e.ref.PercentLoaded != null);
-            if (hasFn && e.ref.PercentLoaded()) {
-              return pollFlashObject = setInterval(function() {
-                if (e.ref.PercentLoaded() === 100) {
-                  _this.flashPlugin = e.ref;
-                  _this.onIsUsable(true);
-                  return intervalClear(pollFlashObject);
-                }
-              }, 250);
-            } else {
-              return waitForFlash(--tries);
+          api = ref.getApi();
+          waitForFlash = function(tries) {
+            if (tries == null) {
+              tries = 5;
             }
-          }, 100);
-        };
-        return waitForFlash();
+            if (!tries) {
+              return _this.onIsUsable(false);
+            }
+            return setTimeout(function() {
+              var hasFn, pollFlashObject;
+              hasFn = Object.prototype.hasOwnProperty.call(api, 'PercentLoaded') || (api.PercentLoaded != null);
+              if (hasFn && api.PercentLoaded()) {
+                return pollFlashObject = setInterval(function() {
+                  if (api.PercentLoaded() === 100) {
+                    _this.flashPlugin = api;
+                    _this.onIsUsable(true);
+                    return intervalClear(pollFlashObject);
+                  }
+                }, 250);
+              } else {
+                return waitForFlash(--tries);
+              }
+            }, 100);
+          };
+          return waitForFlash();
+        }
       });
     };
 

@@ -10,7 +10,7 @@ class window.FlashAudioPlayer
 	SWF_PATH: ''
 	CONTAINER_ID: 'flashAudioContainer'
 	FLASH_ID: 'flashAudioObject'
-	FLASH_VERSION: '9.0.0'
+	FLASH_VERSION: [9, 0]
 
 	MAX_VOLUME: 1
 
@@ -101,21 +101,26 @@ class window.FlashAudioPlayer
 		document.body.appendChild wrapper
 
 		# Embed SWF
-		swfobject.embedSWF(
-			@SWF_PATH, @FLASH_ID, '1', '1', @FLASH_VERSION,
-			null, null, { allowScriptAccess: 'always' }, null, (e) =>
-				return @onIsUsable(false) unless e.success and e.ref
+		flashembed @FLASH_ID,
+			src: @SWF_PATH
+			width: '1'
+			height: '1'
+			version: @FLASH_VERSION
+			onEmbed: (success, ref) =>
+				return @onIsUsable(false) unless success and ref.getApi()
+
+				api = ref.getApi()
 
 				# give Flash some time to init PercentLoaded
 				waitForFlash = (tries = 5) =>
 					return @onIsUsable(false) unless tries
 					setTimeout =>
 						# similar checks for IE & Firefox, respectively
-						hasFn = Object::hasOwnProperty.call(e.ref, 'PercentLoaded') or e.ref.PercentLoaded?
-						if hasFn and e.ref.PercentLoaded()
+						hasFn = Object::hasOwnProperty.call(api, 'PercentLoaded') or api.PercentLoaded?
+						if hasFn and api.PercentLoaded()
 							pollFlashObject = setInterval =>
-								if e.ref.PercentLoaded() is 100
-									@flashPlugin = e.ref
+								if api.PercentLoaded() is 100
+									@flashPlugin = api
 									@onIsUsable true
 									intervalClear pollFlashObject
 							, 250
@@ -124,7 +129,6 @@ class window.FlashAudioPlayer
 					, 100
 
 				waitForFlash()
-		)
 
 	loadError: (e) ->
 		return unless e.url of @loadingAudio
