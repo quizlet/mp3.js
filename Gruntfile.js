@@ -40,8 +40,8 @@ module.exports = function(grunt) {
       }
     },
     mocha_phantomjs: {
-        all: ['build/**/*.html']
-      }
+      all: ['build/**/*.html']
+    }
   });
 
   grunt.loadNpmTasks('grunt-contrib-coffee');
