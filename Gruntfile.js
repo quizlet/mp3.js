@@ -1,23 +1,16 @@
 module.exports = function(grunt) {
-
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-    concat: {
-      options: {
-        separator: ';'
-      },
-      dist: {
-        src: ['dist/**/*.js'],
-        dest: 'dist/<%= pkg.name %>'
-      }
-    },
     coffee: {
       main: {
-        expand: true,
-        cwd: "src",
-        src: ["**/*.coffee"],
-        dest: "dist",
-        ext: ".js"
+        options: { join: true },
+        files: {
+          'dist/mp3.js': ['src/web_audio_player.coffee', 'src/html_audio_player.coffee', 'src/flash_audio_player.coffee', 'src/player.coffee'],
+          'dist/player.js': 'src/player.coffee',
+          'dist/flash_audio_player.js': 'src/flash_audio_player.coffee',
+          'dist/html_audio_player.js': 'src/html_audio_player.coffee',
+          'dist/web_audio_player.js': 'src/web_audio_player.coffee'
+        }
       },
       test: {
         expand: true,
@@ -45,10 +38,9 @@ module.exports = function(grunt) {
   });
 
   grunt.loadNpmTasks('grunt-contrib-coffee');
-  grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-mocha-phantomjs');
 
   grunt.registerTask('test', ['copy:test', 'coffee', 'mocha_phantomjs']);
-  grunt.registerTask('default', ['coffee:main', 'concat', 'copy:main']);
+  grunt.registerTask('default', ['coffee:main', 'copy:main']);
 };
