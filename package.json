@@ -6,6 +6,9 @@
   , "contributors": ["Karoun Kasraie <karoun@quizlet.com>", "David Chanin <dchanin@quizlet.com>"]
   , "keywords": ["audio", "mp3", "webaudio"]
   , "repository": "git://github.com/quizlet/mp3.js"
+  ,"dependencies": {
+    "flashembed": "*"
+  }
   , "devDependencies": {
       "phantomjs": "*"
     , "mocha-phantomjs": "*"
