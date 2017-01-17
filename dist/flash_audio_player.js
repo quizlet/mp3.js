@@ -55,8 +55,7 @@
     };
 
     FlashAudioPlayer.prototype.stop = function(url) {
-      var lowerVol, soundData, volume,
-        _this = this;
+      var lowerVol, soundData, volume;
       if (url in this.loadingAudio) {
         this.loadingAudio[url] = {
           onLoad: [],
@@ -69,44 +68,47 @@
       }
       clearTimeout(soundData.onFinishTimer);
       volume = this.MAX_VOLUME;
-      lowerVol = function() {
-        if (volume > 0) {
-          _this.flashPlugin._setVolume(url, volume -= 0.03);
-          return setTimeout(lowerVol, 10);
-        } else {
-          _this.flashPlugin._stop(url);
-          return _this.flashPlugin._setVolume(url, _this.MAX_VOLUME);
-        }
-      };
+      lowerVol = (function(_this) {
+        return function() {
+          if (volume > 0) {
+            _this.flashPlugin._setVolume(url, volume -= 0.03);
+            return setTimeout(lowerVol, 10);
+          } else {
+            _this.flashPlugin._stop(url);
+            return _this.flashPlugin._setVolume(url, _this.MAX_VOLUME);
+          }
+        };
+      })(this);
       lowerVol();
       delete this.playingAudio[url];
       return typeof soundData.onStop === "function" ? soundData.onStop(url) : void 0;
     };
 
     FlashAudioPlayer.prototype.play = function(url, options) {
-      var _ref,
-        _this = this;
+      var ref1;
       if (options == null) {
         options = {};
       }
       return this.preload(url, {
-        onLoad: function(duration) {
-          if (_this.playingAudio[url]) {
-            _this.stop(url);
-          }
-          _this.flashPlugin._play(url);
-          return _this.playingAudio[url] = {
-            onStop: options.onStop,
-            onFinishTimer: setTimeout(function() {
-              delete _this.playingAudio[url];
-              return typeof options.onFinish === "function" ? options.onFinish(url) : void 0;
-            }, duration)
+        onLoad: (function(_this) {
+          return function(duration) {
+            if (_this.playingAudio[url]) {
+              _this.stop(url);
+            }
+            _this.flashPlugin._play(url);
+            return _this.playingAudio[url] = {
+              onStop: options.onStop,
+              onFinishTimer: setTimeout(function() {
+                delete _this.playingAudio[url];
+                return typeof options.onFinish === "function" ? options.onFinish(url) : void 0;
+              }, duration)
+            };
           };
-        },
+        })(this),
         onError: function() {
           return typeof options.onError === "function" ? options.onError(url) : void 0;
         },
-        timeout: (_ref = options.timeout) != null ? _ref : 0
+        timeout: (ref1 = options.timeout) != null ? ref1 : 0
       });
     };
 
@@ -120,8 +122,7 @@
     };
 
     FlashAudioPlayer.prototype.preload = function(url, options) {
-      var method, _i, _len, _ref,
-        _this = this;
+      var i, len, method, ref1;
       if (options == null) {
         options = {};
       }
@@ -132,9 +133,9 @@
         return typeof options.onLoad === "function" ? options.onLoad(this.loadedAudio[url]) : void 0;
       }
       if (this.loadingAudio[url]) {
-        _ref = ['onLoad', 'onError'];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          method = _ref[_i];
+        ref1 = ['onLoad', 'onError'];
+        for (i = 0, len = ref1.length; i < len; i++) {
+          method = ref1[i];
           this.loadingAudio[url][method].push(options[method]);
         }
       } else {
@@ -145,17 +146,18 @@
         this.flashPlugin._preload(url);
       }
       if (options.timeout) {
-        return setTimeout((function() {
-          return _this.loadError({
-            url: url
-          });
-        }), Number(options.timeout));
+        return setTimeout(((function(_this) {
+          return function() {
+            return _this.loadError({
+              url: url
+            });
+          };
+        })(this)), Number(options.timeout));
       }
     };
 
     FlashAudioPlayer.prototype.appendFlashObject = function() {
-      var replacement, wrapper,
-        _this = this;
+      var replacement, wrapper;
       wrapper = document.createElement('div');
       wrapper.id = this.CONTAINER_ID;
       wrapper.style.position = 'absolute';
@@ -169,48 +171,50 @@
         width: '1',
         height: '1',
         version: this.FLASH_VERSION,
-        onEmbed: function(success, ref) {
-          var api, waitForFlash;
-          if (!(success && ref.getApi())) {
-            return _this.onIsUsable(false);
-          }
-          api = ref.getApi();
-          waitForFlash = function(tries) {
-            if (tries == null) {
-              tries = 5;
-            }
-            if (!tries) {
+        onEmbed: (function(_this) {
+          return function(success, ref) {
+            var api, waitForFlash;
+            if (!(success && ref.getApi())) {
               return _this.onIsUsable(false);
             }
-            return setTimeout(function() {
-              var hasFn, pollFlashObject;
-              hasFn = Object.prototype.hasOwnProperty.call(api, 'PercentLoaded') || (api.PercentLoaded != null);
-              if (hasFn && api.PercentLoaded()) {
-                return pollFlashObject = setInterval(function() {
-                  if (api.PercentLoaded() === 100) {
-                    _this.flashPlugin = api;
-                    _this.onIsUsable(true);
-                    return intervalClear(pollFlashObject);
-                  }
-                }, 250);
-              } else {
-                return waitForFlash(--tries);
+            api = ref.getApi();
+            waitForFlash = function(tries) {
+              if (tries == null) {
+                tries = 5;
               }
-            }, 100);
+              if (!tries) {
+                return _this.onIsUsable(false);
+              }
+              return setTimeout(function() {
+                var hasFn, pollFlashObject;
+                hasFn = Object.prototype.hasOwnProperty.call(api, 'PercentLoaded') || (api.PercentLoaded != null);
+                if (hasFn && api.PercentLoaded()) {
+                  return pollFlashObject = setInterval(function() {
+                    if (api.PercentLoaded() === 100) {
+                      _this.flashPlugin = api;
+                      _this.onIsUsable(true);
+                      return clearInterval(pollFlashObject);
+                    }
+                  }, 250);
+                } else {
+                  return waitForFlash(--tries);
+                }
+              }, 100);
+            };
+            return waitForFlash();
           };
-          return waitForFlash();
-        }
+        })(this)
       });
     };
 
     FlashAudioPlayer.prototype.loadError = function(e) {
-      var cb, _i, _len, _ref;
+      var cb, i, len, ref1;
       if (!(e.url in this.loadingAudio)) {
         return;
       }
-      _ref = this.loadingAudio[e.url].onError;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        cb = _ref[_i];
+      ref1 = this.loadingAudio[e.url].onError;
+      for (i = 0, len = ref1.length; i < len; i++) {
+        cb = ref1[i];
         if (cb != null) {
           cb(e.url);
         }
@@ -220,14 +224,14 @@
     };
 
     FlashAudioPlayer.prototype.loadComplete = function(e) {
-      var cb, _i, _len, _ref;
+      var cb, i, len, ref1;
       if (!(e.url in this.loadingAudio)) {
         return;
       }
       this.loadedAudio[e.url] = e.duration;
-      _ref = this.loadingAudio[e.url].onLoad;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        cb = _ref[_i];
+      ref1 = this.loadingAudio[e.url].onLoad;
+      for (i = 0, len = ref1.length; i < len; i++) {
+        cb = ref1[i];
         if (cb != null) {
           cb(e.duration);
         }
