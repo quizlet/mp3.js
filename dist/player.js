@@ -1,6 +1,6 @@
 (function() {
   var factory,
-    __hasProp = {}.hasOwnProperty;
+    hasProp = {}.hasOwnProperty;
 
   factory = function() {
     var AudioPlayer;
@@ -8,8 +8,7 @@
       AudioPlayer.usablePlugin = null;
 
       function AudioPlayer(settings) {
-        var method, _fn, _ref,
-          _this = this;
+        var fn, method, ref;
         if (settings == null) {
           settings = {};
         }
@@ -17,83 +16,98 @@
           plugins: settings.plugins || [WebAudioPlayer, HtmlAudioPlayer, FlashAudioPlayer],
           onUsable: settings.onUsable || function() {},
           onNotUsable: settings.onNotUsable || function() {
-            var _ref;
-            return (_ref = window.console) != null ? typeof _ref.error === "function" ? _ref.error('Cannot play audio') : void 0 : void 0;
+            var ref;
+            return (ref = window.console) != null ? typeof ref.error === "function" ? ref.error('Cannot play audio') : void 0 : void 0;
           }
         };
         this.methodBuffer = [];
         this.plugin = {
-          preload: function(url, options) {
-            if (options == null) {
-              options = {};
-            }
-            return _this.methodBuffer.push(['preload', arguments]);
-          },
-          play: function(url, options) {
-            if (options == null) {
-              options = {};
-            }
-            return _this.methodBuffer.push(['play', arguments]);
-          },
-          isPlaying: function(url) {
-            return _this.methodBuffer.push(['isPlaying', arguments]);
-          },
-          destruct: function(url) {
-            return _this.methodBuffer.push(['destruct', arguments]);
-          },
-          stop: function() {
-            return _this.methodBuffer.push(['stop', arguments]);
-          },
-          stopAll: function() {
-            return _this.methodBuffer.push(['stopAll', arguments]);
-          }
+          preload: (function(_this) {
+            return function(url, options) {
+              if (options == null) {
+                options = {};
+              }
+              return _this.methodBuffer.push(['preload', arguments]);
+            };
+          })(this),
+          play: (function(_this) {
+            return function(url, options) {
+              if (options == null) {
+                options = {};
+              }
+              return _this.methodBuffer.push(['play', arguments]);
+            };
+          })(this),
+          isPlaying: (function(_this) {
+            return function(url) {
+              return _this.methodBuffer.push(['isPlaying', arguments]);
+            };
+          })(this),
+          destruct: (function(_this) {
+            return function(url) {
+              return _this.methodBuffer.push(['destruct', arguments]);
+            };
+          })(this),
+          stop: (function(_this) {
+            return function() {
+              return _this.methodBuffer.push(['stop', arguments]);
+            };
+          })(this),
+          stopAll: (function(_this) {
+            return function() {
+              return _this.methodBuffer.push(['stopAll', arguments]);
+            };
+          })(this)
         };
-        _ref = this.plugin;
-        _fn = function(method) {
-          return _this[method] = function() {
-            return this.plugin[method].apply(this.plugin, arguments);
+        ref = this.plugin;
+        fn = (function(_this) {
+          return function(method) {
+            return _this[method] = function() {
+              return this.plugin[method].apply(this.plugin, arguments);
+            };
           };
-        };
-        for (method in _ref) {
-          if (!__hasProp.call(_ref, method)) continue;
-          _fn(method);
+        })(this);
+        for (method in ref) {
+          if (!hasProp.call(ref, method)) continue;
+          fn(method);
         }
         this.initUsablePlugin();
       }
 
       AudioPlayer.prototype.initUsablePlugin = function() {
-        var plugin, _base,
-          _this = this;
+        var base, plugin;
         if (this.constructor.usablePlugin != null) {
           this._initPlugin(this.constructor.usablePlugin);
           return;
         }
         plugin = this.settings.plugins.shift();
         if (!plugin) {
-          return typeof (_base = this.settings).onNotUsable === "function" ? _base.onNotUsable() : void 0;
+          return typeof (base = this.settings).onNotUsable === "function" ? base.onNotUsable() : void 0;
         }
-        return plugin.getInstance().isUsable(function(usable) {
-          if (usable) {
-            return _this._initPlugin(plugin);
-          } else {
-            return _this.initUsablePlugin();
-          }
-        });
+        return plugin.getInstance().isUsable((function(_this) {
+          return function(usable) {
+            if (usable) {
+              return _this._initPlugin(plugin);
+            } else {
+              return _this.initUsablePlugin();
+            }
+          };
+        })(this));
       };
 
       AudioPlayer.prototype._initPlugin = function(plugin) {
-        var args, method, _base, _ref, _results;
+        var args, base, method, ref, results;
         this.plugin = plugin.getInstance();
         this.constructor.usablePlugin = plugin;
-        if (typeof (_base = this.settings).onUsable === "function") {
-          _base.onUsable();
+        if (typeof (base = this.settings).onUsable === "function") {
+          base.onUsable();
         }
-        _results = [];
+        results = [];
         while (this.methodBuffer.length) {
-          _ref = this.methodBuffer.shift(), method = _ref[0], args = _ref[1];
-          _results.push(this.plugin[method].apply(this.plugin, args));
+          ref = this.methodBuffer.shift(), method = ref[0], args = ref[1];
+          results.push(this.plugin[method].apply(this.plugin, args));
         }
-        return _results;
+        return results;
       };
 
       return AudioPlayer;

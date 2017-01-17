@@ -20,11 +20,11 @@
     }
 
     WebAudioPlayer.prototype.isUsable = function(cb) {
-      var _base;
+      var base;
       if (cb == null) {
         cb = function() {};
       }
-      return cb((this.audioContext != null) && (typeof (_base = this.usabilityElm).canPlayType === "function" ? _base.canPlayType('audio/mpeg') : void 0));
+      return cb((this.audioContext != null) && (typeof (base = this.usabilityElm).canPlayType === "function" ? base.canPlayType('audio/mpeg') : void 0));
     };
 
     WebAudioPlayer.prototype.isPlaying = function(url) {
@@ -60,39 +60,40 @@
     };
 
     WebAudioPlayer.prototype.play = function(url, options) {
-      var _ref,
-        _this = this;
+      var ref;
       if (options == null) {
         options = {};
       }
       return this.preload(url, {
-        onLoad: function(duration) {
-          var buffer, bufferSource, gainNode;
-          if (_this.playingAudio[url]) {
-            _this.stop(url);
-          }
-          buffer = _this.loadedAudio[url];
-          bufferSource = _this.audioContext.createBufferSource();
-          bufferSource.buffer = buffer;
-          gainNode = (_this.audioContext.createGainNode || _this.audioContext.createGain).call(_this.audioContext);
-          gainNode.gain.linearRampToValueAtTime(1, _this.audioContext.currentTime);
-          gainNode.connect(_this.audioContext.destination);
-          bufferSource.connect(gainNode);
-          (bufferSource.noteOn || bufferSource.start).call(bufferSource, 0);
-          return _this.playingAudio[url] = {
-            onStop: options.onStop,
-            source: bufferSource,
-            gainNode: gainNode,
-            onFinishTimer: setTimeout(function() {
-              delete _this.playingAudio[url];
-              return typeof options.onFinish === "function" ? options.onFinish(url) : void 0;
-            }, duration)
+        onLoad: (function(_this) {
+          return function(duration) {
+            var buffer, bufferSource, gainNode;
+            if (_this.playingAudio[url]) {
+              _this.stop(url);
+            }
+            buffer = _this.loadedAudio[url];
+            bufferSource = _this.audioContext.createBufferSource();
+            bufferSource.buffer = buffer;
+            gainNode = (_this.audioContext.createGainNode || _this.audioContext.createGain).call(_this.audioContext);
+            gainNode.gain.linearRampToValueAtTime(1, _this.audioContext.currentTime);
+            gainNode.connect(_this.audioContext.destination);
+            bufferSource.connect(gainNode);
+            (bufferSource.noteOn || bufferSource.start).call(bufferSource, 0);
+            return _this.playingAudio[url] = {
+              onStop: options.onStop,
+              source: bufferSource,
+              gainNode: gainNode,
+              onFinishTimer: setTimeout(function() {
+                delete _this.playingAudio[url];
+                return typeof options.onFinish === "function" ? options.onFinish(url) : void 0;
+              }, duration)
+            };
           };
-        },
+        })(this),
         onError: function() {
           return typeof options.onError === "function" ? options.onError(url) : void 0;
         },
-        timeout: (_ref = options.timeout) != null ? _ref : 0
+        timeout: (ref = options.timeout) != null ? ref : 0
       });
     };
 
@@ -105,8 +106,7 @@
     };
 
     WebAudioPlayer.prototype.preload = function(url, options) {
-      var method, xhr, _i, _len, _ref,
-        _this = this;
+      var i, len, method, ref, xhr;
       if (options == null) {
         options = {};
       }
@@ -118,9 +118,9 @@
         return typeof options.onLoad === "function" ? options.onLoad(this.loadedAudio[url].duration * 1000) : void 0;
       }
       if (this.loadingAudio[url]) {
-        _ref = ['onLoad', 'onError'];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          method = _ref[_i];
+        ref = ['onLoad', 'onError'];
+        for (i = 0, len = ref.length; i < len; i++) {
+          method = ref[i];
           this.loadingAudio[url][method].push(options[method]);
         }
       } else {
@@ -131,32 +131,38 @@
         xhr = new XMLHttpRequest();
         xhr.open('GET', url, true);
         xhr.responseType = 'arraybuffer';
-        xhr.onload = function() {
-          return _this.audioContext.decodeAudioData(xhr.response, function(buffer) {
-            var cb, _j, _len1, _ref1;
-            _this.loadedAudio[url] = buffer;
-            _ref1 = _this.loadingAudio[url].onLoad;
-            for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-              cb = _ref1[_j];
-              if (cb != null) {
-                cb(buffer.duration * 1000);
+        xhr.onload = (function(_this) {
+          return function() {
+            return _this.audioContext.decodeAudioData(xhr.response, function(buffer) {
+              var cb, j, len1, ref1;
+              _this.loadedAudio[url] = buffer;
+              ref1 = _this.loadingAudio[url].onLoad;
+              for (j = 0, len1 = ref1.length; j < len1; j++) {
+                cb = ref1[j];
+                if (cb != null) {
+                  cb(buffer.duration * 1000);
+                }
               }
-            }
-            return delete _this.loadingAudio[url];
-          }, function() {
+              return delete _this.loadingAudio[url];
+            }, function() {
+              return _this.handleLoadingError(url);
+            });
+          };
+        })(this);
+        xhr.onerror = (function(_this) {
+          return function() {
             return _this.handleLoadingError(url);
-          });
-        };
-        xhr.onerror = function() {
-          return _this.handleLoadingError(url);
-        };
+          };
+        })(this);
         xhr.send();
         this.loadingAudio[url].xhr = xhr;
       }
       if (options.timeout) {
-        return setTimeout((function() {
-          return _this.handleLoadingError(url);
-        }), Number(options.timeout));
+        return setTimeout(((function(_this) {
+          return function() {
+            return _this.handleLoadingError(url);
+          };
+        })(this)), Number(options.timeout));
       }
     };
 
@@ -181,18 +187,18 @@
           }
         }
         return this.constructor.audioContext;
-      } catch (_error) {}
+      } catch (undefined) {}
     };
 
     WebAudioPlayer.prototype.handleLoadingError = function(url) {
-      var cb, _i, _len, _ref;
+      var cb, i, len, ref;
       if (!(url in this.loadingAudio)) {
         return;
       }
       this.loadingAudio[url].xhr.abort();
-      _ref = this.loadingAudio[url].onError;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        cb = _ref[_i];
+      ref = this.loadingAudio[url].onError;
+      for (i = 0, len = ref.length; i < len; i++) {
+        cb = ref[i];
         if (cb != null) {
           cb(url);
         }

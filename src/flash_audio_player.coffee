@@ -122,7 +122,7 @@ class window.FlashAudioPlayer
 								if api.PercentLoaded() is 100
 									@flashPlugin = api
 									@onIsUsable true
-									intervalClear pollFlashObject
+									clearInterval pollFlashObject
 							, 250
 						else
 							waitForFlash --tries
