@@ -36,6 +36,13 @@ class window.WebAudioPlayer
 		soundData.onStop?(url)
 
 	play: (url, options = {}) ->
+		# In Chrome for Android we see the following error
+		# An AudioContext in a cross origin iframe must be created or resumed from a user gesture to enable audio output.
+		# When we play on demand, we check if we've been suspended by this security feature and resume if so
+		if @audioContext.state == 'suspended'
+			return @audioContext.resume().then =>
+				@play(url, options)
+
 		@preload url,
 			onLoad: (duration) =>
 				@stop(url) if @playingAudio[url]

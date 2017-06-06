@@ -64,6 +64,13 @@
       if (options == null) {
         options = {};
       }
+      if (this.audioContext.state === 'suspended') {
+        return this.audioContext.resume().then((function(_this) {
+          return function() {
+            return _this.play(url, options);
+          };
+        })(this));
+      }
       return this.preload(url, {
         onLoad: (function(_this) {
           return function(duration) {
